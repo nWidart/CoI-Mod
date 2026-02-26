@@ -1,9 +1,11 @@
 ﻿using Mafi;
+using Mafi.Core.Input;
+using Mafi.Core.Trains;
 using Mafi.Localization;
+using Mafi.Unity.Camera;
 using Mafi.Unity.InputControl;
 using Mafi.Unity.Ui;
-using Mafi.Unity.UiToolkit;
-using Mafi.Unity.UiToolkit.Component;
+using Mafi.Unity.Ui.Trains;
 using Mafi.Unity.UiToolkit.Library;
 
 namespace ExampleMod;
@@ -11,22 +13,29 @@ namespace ExampleMod;
 [GlobalDependency(RegistrationMode.AsEverything)]
 public class TrainsUIWindow : Window
 {
-    public TrainsUIWindow() : base(new LocStrFormatted("Trains Management"))
+    private readonly TrainsManager _trainsManager;
+
+    public TrainsUIWindow(TrainsManager trainsManager,
+        IInputScheduler mInputScheduler,
+        InspectorsManager mInspectorsManager,
+        CameraController mCameraController,
+        TrainDesignerWindow.Controller mTrainDesigner,
+        TrainLinesManager mTrainLinesManager) : base(new LocStrFormatted("Trains Management"))
     {
-        this.WindowSize(25.Percent(), 700.px());
+        _trainsManager = trainsManager;
+
+        this.WindowSize(1000.px(), 900.px());
         this.MakeMovable();
         this.EnablePinning();
         this.Title(new LocStrFormatted("Trains Management"));
 
-        Mafi.Unity.Ui.Library.Display dateDisplay = new Mafi.Unity.Ui.Library.Display()
-            .MinWidth(150.px())
-            .Height(26.px())
-            .TextCenterMiddle()
-            .ClassRemove(Cls.displayFont);
-        
-        dateDisplay.SetValue("Hello trains".AsLoc());
-        
-        this.Add(dateDisplay);
+        Column trainsColumn = new TrainUiColumn(mInputScheduler,
+            mInspectorsManager,
+            mCameraController,
+            mTrainLinesManager,
+            mTrainDesigner,
+            () => _trainsManager.Trains.AsEnumerable());
+        this.Body.Add(trainsColumn);
     }
 
     [GlobalDependency(RegistrationMode.AsEverything)]
