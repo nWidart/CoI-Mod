@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Mafi;
 using Mafi.Core;
@@ -45,13 +44,40 @@ public class AllTrainsTab : Column
 
         Add(GetSearchRow().AlignSelfStretch());
         Add(new HorizontalDivider().AlignSelfStretch());
+        Add(GetFilterRow().AlignSelfStretch());
+        Add(new HorizontalDivider().AlignSelfStretch());
         Add(GetTrainsRow().AlignSelfStretch());
+    }
+
+    private UiComponent GetFilterRow()
+    {
+        // var buttonIconText = new ButtonIconText(Button.ToggleGroup, product.IconPath, (LocStrFormatted) product.Strings.Name);
+        // var observeSelected = buttonIconText.ObserveSelected<ButtonIconText>((Func<bool>) (() => this.m_selectedProduct == product));
+        // this.m_fuelTypeButtonsRow.Add((UiComponent) observeSelected.OnClick<ButtonIconText>((Action) (() => this.selectProduct((Option<ProductProto>) product))));
+
+        var filterGroupButtons = new ToggleButtonGroupRow();
+
+        var buttonOne = new ButtonText(Button.ToggleGroup, Tr.TrainStatus_NotSpawned.AsFormatted);
+        buttonOne.OnClick(evt => Log.Info(evt.ToString()));
+        var buttonTwo = new ButtonText(Button.ToggleGroup, Tr.TrainStatus_AtStation.AsFormatted);
+        var buttonThree = new ButtonText(Button.ToggleGroup, Tr.TrainStatus_WaitingForFreeTrack.AsFormatted);
+        var buttonFour = new ButtonText(Button.ToggleGroup, Tr.TrainStatus_ArrivalConditionsNotMet.AsFormatted);
+        filterGroupButtons.Add(buttonOne, buttonTwo, buttonThree, buttonFour);
+
+
+        var row = new Row
+        {
+            new Title(new LocStrFormatted("Train Status")).NoBorder(),
+            new VerticalDivider().MarginLeftRight(2.pt()),
+            filterGroupButtons
+        };
+        return row;
     }
 
     private UiComponent GetSearchRow()
     {
         _nothingFoundInfo = new Label().AlignSelfCenter().Hide();
-        
+
         var searchRow = new Row();
         var searchColumn = new Column();
         var textField = new TextField()
@@ -65,7 +91,7 @@ public class AllTrainsTab : Column
 
         searchRow.Add(searchColumn.AlignSelfStretch());
         searchRow.Add(this._nothingFoundInfo);
-        
+
         return searchRow;
     }
 
@@ -77,7 +103,7 @@ public class AllTrainsTab : Column
             _mTrainLinesManager,
             _mTrainDesigner,
             () => _trains);
-        
+
         return trainsColumn;
     }
 
