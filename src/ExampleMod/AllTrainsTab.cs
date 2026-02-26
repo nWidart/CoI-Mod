@@ -18,8 +18,13 @@ namespace ExampleMod;
 public class AllTrainsTab : Column
 {
     private readonly TrainsManager _trainsManager;
+    private readonly IInputScheduler _mInputScheduler;
+    private readonly InspectorsManager _mInspectorsManager;
+    private readonly CameraController _mCameraController;
+    private readonly TrainDesignerWindow.Controller _mTrainDesigner;
+    private readonly TrainLinesManager _mTrainLinesManager;
     private Option<string> _searchText;
-    private readonly Label _nothingFoundInfo;
+    private Label _nothingFoundInfo;
     private IEnumerable<Train> _trains;
 
     public AllTrainsTab(
@@ -31,8 +36,22 @@ public class AllTrainsTab : Column
         TrainLinesManager mTrainLinesManager)
     {
         _trainsManager = trainsManager;
+        _mInputScheduler = mInputScheduler;
+        _mInspectorsManager = mInspectorsManager;
+        _mCameraController = mCameraController;
+        _mTrainDesigner = mTrainDesigner;
+        _mTrainLinesManager = mTrainLinesManager;
         FetchTrains();
 
+        Add(GetSearchRow().AlignSelfStretch());
+        Add(new HorizontalDivider().AlignSelfStretch());
+        Add(GetTrainsRow().AlignSelfStretch());
+    }
+
+    private UiComponent GetSearchRow()
+    {
+        _nothingFoundInfo = new Label().AlignSelfCenter().Hide();
+        
         var searchRow = new Row();
         var searchColumn = new Column();
         var textField = new TextField()
@@ -45,45 +64,48 @@ public class AllTrainsTab : Column
         searchColumn.Add(c => c.Width(100.Percent()));
 
         searchRow.Add(searchColumn.AlignSelfStretch());
-        searchRow.Add((this._nothingFoundInfo = new Label()).AlignSelfCenter().Hide());
+        searchRow.Add(this._nothingFoundInfo);
+        
+        return searchRow;
+    }
 
-        Column trainsColumn = new TrainUiColumn(mInputScheduler,
-            mInspectorsManager,
-            mCameraController,
-            mTrainLinesManager,
-            mTrainDesigner,
-            () => this._trains);
-
-        this.Add(searchRow.AlignSelfStretch());
-        this.Add(new HorizontalDivider().AlignSelfStretch());
-        this.Add(trainsColumn.AlignSelfStretch());
+    private UiComponent GetTrainsRow()
+    {
+        Column trainsColumn = new TrainUiColumn(_mInputScheduler,
+            _mInspectorsManager,
+            _mCameraController,
+            _mTrainLinesManager,
+            _mTrainDesigner,
+            () => _trains);
+        
+        return trainsColumn;
     }
 
     private IEnumerable<Train> FetchTrains()
     {
-        this._trains = _trainsManager.Trains.AsEnumerable();
-        return this._trains;
+        _trains = _trainsManager.Trains.AsEnumerable();
+        return _trains;
     }
 
     private void Update()
     {
-        if (!this._searchText.HasValue)
+        if (!_searchText.HasValue)
         {
-            this._trains = FetchTrains();
-            this._nothingFoundInfo.Show();
+            _trains = FetchTrains();
+            _nothingFoundInfo.Show();
             return;
         }
 
-        this._nothingFoundInfo.Hide();
-        this._trains = _trainsManager.Trains
+        _nothingFoundInfo.Hide();
+        _trains = _trainsManager.Trains
             .Where(train =>
-                train.Name.ToLower().Contains(this._searchText.Value.ToLower())
+                train.Name.ToLower().Contains(_searchText.Value.ToLower())
             );
     }
 
     private void Search(string text)
     {
-        this._searchText = string.IsNullOrWhiteSpace(text) ? Option<string>.None : (Option<string>)text;
+        _searchText = string.IsNullOrWhiteSpace(text) ? Option<string>.None : (Option<string>)text;
         Update();
     }
 }
