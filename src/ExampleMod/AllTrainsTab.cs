@@ -14,14 +14,8 @@ using Column = Mafi.Unity.UiToolkit.Library.Column;
 
 namespace ExampleMod;
 
-public class AllTrainsTab : Column
+public class AllTrainsTab : AbstractTrainTab
 {
-    private readonly TrainsManager _trainsManager;
-    private readonly IInputScheduler _mInputScheduler;
-    private readonly InspectorsManager _mInspectorsManager;
-    private readonly CameraController _mCameraController;
-    private readonly TrainDesignerWindow.Controller _mTrainDesigner;
-    private readonly TrainLinesManager _mTrainLinesManager;
     private Option<string> _searchText;
     private Label _nothingFoundInfo;
     private IEnumerable<Train> _trains;
@@ -32,14 +26,13 @@ public class AllTrainsTab : Column
         InspectorsManager mInspectorsManager,
         CameraController mCameraController,
         TrainDesignerWindow.Controller mTrainDesigner,
-        TrainLinesManager mTrainLinesManager)
+        TrainLinesManager mTrainLinesManager): base(trainsManager,
+        mInputScheduler,
+        mInspectorsManager,
+        mCameraController,
+        mTrainDesigner,
+        mTrainLinesManager)
     {
-        _trainsManager = trainsManager;
-        _mInputScheduler = mInputScheduler;
-        _mInspectorsManager = mInspectorsManager;
-        _mCameraController = mCameraController;
-        _mTrainDesigner = mTrainDesigner;
-        _mTrainLinesManager = mTrainLinesManager;
         FetchTrains();
 
         Add(GetSearchRow().AlignSelfStretch());
@@ -97,11 +90,11 @@ public class AllTrainsTab : Column
 
     private UiComponent GetTrainsRow()
     {
-        Column trainsColumn = new TrainUiColumn(_mInputScheduler,
-            _mInspectorsManager,
-            _mCameraController,
-            _mTrainLinesManager,
-            _mTrainDesigner,
+        Column trainsColumn = new TrainUiColumn(MInputScheduler,
+            MInspectorsManager,
+            MCameraController,
+            MTrainLinesManager,
+            MTrainDesigner,
             () => _trains);
 
         return trainsColumn;
@@ -109,7 +102,7 @@ public class AllTrainsTab : Column
 
     private IEnumerable<Train> FetchTrains()
     {
-        _trains = _trainsManager.Trains.AsEnumerable();
+        _trains = TrainsManager.Trains.AsEnumerable();
         return _trains;
     }
 
@@ -123,7 +116,7 @@ public class AllTrainsTab : Column
         }
 
         _nothingFoundInfo.Hide();
-        _trains = _trainsManager.Trains
+        _trains = TrainsManager.Trains
             .Where(train =>
                 train.Name.ToLower().Contains(_searchText.Value.ToLower())
             );
