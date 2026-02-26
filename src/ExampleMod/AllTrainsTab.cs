@@ -18,10 +18,9 @@ namespace ExampleMod;
 public class AllTrainsTab : Column
 {
     private readonly TrainsManager _trainsManager;
-    private readonly TextField searchBox;
-    private Option<string> searchText;
-    private readonly Label nothingFoundInfo;
-    private IEnumerable<Train> trains;
+    private Option<string> _searchText;
+    private readonly Label _nothingFoundInfo;
+    private IEnumerable<Train> _trains;
 
     public AllTrainsTab(
         TrainsManager trainsManager,
@@ -32,7 +31,7 @@ public class AllTrainsTab : Column
         TrainLinesManager mTrainLinesManager)
     {
         _trainsManager = trainsManager;
-        InitTrains();
+        FetchTrains();
 
         var searchRow = new Row();
         var searchColumn = new Column();
@@ -41,49 +40,50 @@ public class AllTrainsTab : Column
             .OnValueChanged(this.Search)
             .Placeholder((LocStrFormatted)Tr.Search)
             .AlignSelfStretch();
-        
+
         searchColumn.Add(textField.CharLimit(60).AddClearButton());
         searchColumn.Add(c => c.Width(100.Percent()));
 
         searchRow.Add(searchColumn.AlignSelfStretch());
-        searchRow.Add((this.nothingFoundInfo = new Label()).AlignSelfCenter().Hide());
-        
+        searchRow.Add((this._nothingFoundInfo = new Label()).AlignSelfCenter().Hide());
+
         Column trainsColumn = new TrainUiColumn(mInputScheduler,
             mInspectorsManager,
             mCameraController,
             mTrainLinesManager,
             mTrainDesigner,
-            () => this.trains);
+            () => this._trains);
 
         this.Add(searchRow.AlignSelfStretch());
         this.Add(new HorizontalDivider().AlignSelfStretch());
         this.Add(trainsColumn.AlignSelfStretch());
     }
 
-    private IEnumerable<Train> InitTrains()
+    private IEnumerable<Train> FetchTrains()
     {
-        this.trains = _trainsManager.Trains.AsEnumerable();
-        return this.trains;
+        this._trains = _trainsManager.Trains.AsEnumerable();
+        return this._trains;
     }
 
     private void Update()
     {
-        if (this.searchText.HasValue)
+        if (!this._searchText.HasValue)
         {
-            this.nothingFoundInfo.Hide();
-            this.trains = _trainsManager.Trains.Where(train => train.Name.ToLower().Contains(this.searchText.Value.ToLower()));
+            this._trains = FetchTrains();
+            this._nothingFoundInfo.Show();
+            return;
         }
-        else
-        {
-            this.trains = InitTrains();
-            this.nothingFoundInfo.Show();
-        }
+
+        this._nothingFoundInfo.Hide();
+        this._trains = _trainsManager.Trains
+            .Where(train =>
+                train.Name.ToLower().Contains(this._searchText.Value.ToLower())
+            );
     }
 
     private void Search(string text)
     {
-        this.searchText = string.IsNullOrWhiteSpace(text) ? Option<string>.None : (Option<string>)text;
-        Log.Info(text);
+        this._searchText = string.IsNullOrWhiteSpace(text) ? Option<string>.None : (Option<string>)text;
         Update();
     }
 }
