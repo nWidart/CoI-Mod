@@ -41,9 +41,8 @@ public class AllTrainsTab : Column
             .OnValueChanged(this.Search)
             .Placeholder((LocStrFormatted)Tr.Search)
             .AlignSelfStretch();
-        var searchField = new PanelSubHeader()
-            .BodyAdd(textField.CharLimit(60).AddClearButton());
-        searchColumn.Add(searchField);
+        
+        searchColumn.Add(textField.CharLimit(60).AddClearButton());
         searchColumn.Add(c => c.Width(100.Percent()));
 
         searchRow.Add(searchColumn.AlignSelfStretch());
