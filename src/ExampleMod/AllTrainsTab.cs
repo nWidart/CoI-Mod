@@ -55,11 +55,10 @@ public class AllTrainsTab : Column
             mTrainLinesManager,
             mTrainDesigner,
             () => this.trains);
-        var trainRow = new Row { trainsColumn.AlignSelfStretch() };
 
         this.Add(searchRow.AlignSelfStretch());
         this.Add(new HorizontalDivider().AlignSelfStretch());
-        this.Add(trainRow.AlignSelfStretch());
+        this.Add(trainsColumn.AlignSelfStretch());
     }
 
     private IEnumerable<Train> InitTrains()
