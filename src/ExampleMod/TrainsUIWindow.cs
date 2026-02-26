@@ -35,11 +35,17 @@ public class TrainsUIWindow : Window
         this.Title(new LocStrFormatted("Trains Management"));
 
         var allTrainsTab = new AllTrainsTab(trainsManager, mInputScheduler, mInspectorsManager, mCameraController, mTrainDesigner, mTrainLinesManager);
+        var stuckTrainsTab = new StuckTrainsTab(trainsManager, mInputScheduler, mInspectorsManager, mCameraController, mTrainDesigner, mTrainLinesManager);
+        
         var tabs = new TabContainer()
         {
             {
                 "Trains".AsLoc(),
                 allTrainsTab
+            },
+            {
+                "Stuck Trains".AsLoc(),
+                stuckTrainsTab
             }
         };
 
