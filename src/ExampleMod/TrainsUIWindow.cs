@@ -36,14 +36,12 @@ public class TrainsUIWindow : Window
 
         var allTrainsTab = new AllTrainsTab(trainsManager, mInputScheduler, mInspectorsManager, mCameraController, mTrainDesigner, mTrainLinesManager);
         var tabs = new TabContainer()
+        {
             {
-                {
-                    "Trains".AsLoc(),
-                    allTrainsTab
-                }
+                "Trains".AsLoc(),
+                allTrainsTab
             }
-            .AlignSelfStretch()
-            .ReducedPaddingBody();
+        };
 
         this.Body.Add(tabs);
 
