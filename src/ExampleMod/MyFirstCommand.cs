@@ -8,25 +8,30 @@ namespace ExampleMod;
 [GlobalDependency(RegistrationMode.AsSelf)]
 public class MyFirstCommand
 {
-    private readonly TrainLinesManager _trainLinesManager;
+    private readonly TrainsManager _trainsManager;
+    private readonly TrainsUIWindow.Controller _trainsUIWindowController;
 
-    public MyFirstCommand(TrainLinesManager trainLinesManager)
+    public MyFirstCommand(TrainsManager trainsManager, TrainsUIWindow.Controller trainsUIWindowController)
     {
-        _trainLinesManager = trainLinesManager;
+        _trainsManager = trainsManager;
+        _trainsUIWindowController = trainsUIWindowController;
     }
 
-    [ConsoleCommand(true, false, null, "hello")]
-    GameCommandResult helloWorld()
+    [ConsoleCommand(true, false, null, "stuck_trains")]
+    GameCommandResult openTrains()
     {
-        for (var i = 0; i < _trainLinesManager.Lines.Count; i++)
-        {
-            var trainLineMembers = _trainLinesManager.Lines[i].Trains;
-            
-            Log.Info(_trainLinesManager.Lines[i].ToString());
-            
-            Log.Info(trainLineMembers.ToString());
-        }
+        _trainsUIWindowController.Open();
+        return GameCommandResult.Success("Trains opened.");
+    }
 
-        return GameCommandResult.Success("Hello World!");
+    [ConsoleCommand(true, false, null, "stuck_trains")]
+    GameCommandResult StuckTrains()
+    {
+        foreach (var train in _trainsManager.Trains)
+        {
+            Log.Info(train.ToString());
+        }
+     
+        return GameCommandResult.Success("----");
     }
 }

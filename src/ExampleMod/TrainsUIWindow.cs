@@ -1,5 +1,6 @@
 ﻿using Mafi;
 using Mafi.Localization;
+using Mafi.Unity.InputControl;
 using Mafi.Unity.Ui;
 using Mafi.Unity.UiToolkit.Component;
 using Mafi.Unity.UiToolkit.Library;
@@ -7,10 +8,24 @@ using Mafi.Unity.UiToolkit.Library;
 namespace ExampleMod;
 
 [GlobalDependency(RegistrationMode.AsEverything)]
-public class TrainsUIWindow : PanelWithHeader
+public class TrainsUIWindow : Window
 {
-    public TrainsUIWindow(UiContext uiContext)
+    public TrainsUIWindow() : base(new LocStrFormatted("Trains Management"))
     {
-        this.Title("Hello world!".AsLoc());
+        this.WindowSize(25.Percent(), 700.px());
+        this.MakeMovable();
+        this.EnablePinning();
+        this.Title(new LocStrFormatted("Trains Management"));
+    }
+
+    [GlobalDependency(RegistrationMode.AsEverything)]
+    public class Controller : WindowController<TrainsUIWindow>
+    {
+        public Controller(ControllerContext controllerContext) : base(controllerContext)
+        {
+            controllerContext.UiRoot.AddDependency(this);
+        } 
+        
+        public void Open() => this.ActivateSelf();
     }
 }
