@@ -17,7 +17,7 @@ public class MyFirstCommand
         _trainsUIWindowController = trainsUIWindowController;
     }
 
-    [ConsoleCommand(true, false, null, "stuck_trains")]
+    [ConsoleCommand(true, false, null, "stuck_trains_ui")]
     GameCommandResult openTrains()
     {
         _trainsUIWindowController.Open();
