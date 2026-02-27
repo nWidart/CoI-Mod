@@ -29,10 +29,10 @@ public class TrainsUIWindow : Window
     {
         _trainsManager = trainsManager;
 
-        this.WindowSize(1000.px(), 900.px());
-        this.MakeMovable();
-        this.EnablePinning();
-        this.Title(new LocStrFormatted("Trains Management"));
+        WindowSize(1000.px(), 900.px());
+        MakeMovable();
+        EnablePinning();
+        Title(new LocStrFormatted("Trains Management"));
 
         var allTrainsTab = new AllTrainsTab(trainsManager, mInputScheduler, mInspectorsManager, mCameraController, mTrainDesigner, mTrainLinesManager);
         var stuckTrainsTab = new StuckTrainsTab(trainsManager, mInputScheduler, mInspectorsManager, mCameraController, mTrainDesigner, mTrainLinesManager);
@@ -49,11 +49,11 @@ public class TrainsUIWindow : Window
             }
         };
 
-        this.Body.Add(tabs);
+        Body.Add(tabs);
 
         var shortcut = shortcutsManager.ResolveShortcutToString("Trains Window",
-            _ => KeyBindings.FromKey(KbCategory.Tools, ShortcutMode.Game, KeyCode.F8));
-        this.ShortcutToShow(shortcut);
+            _ => ShortcutsMap.Instance.OpenTrainsWindow);
+        ShortcutToShow(shortcut);
     }
 
     [GlobalDependency(RegistrationMode.AsEverything)]
@@ -62,6 +62,8 @@ public class TrainsUIWindow : Window
         public Controller(ControllerContext controllerContext) : base(controllerContext)
         {
             controllerContext.UiRoot.AddDependency(this);
+            controllerContext.InputManager
+                .RegisterGlobalShortcut(_ => ShortcutsMap.Instance.OpenTrainsWindow, this);
         }
 
         public void Open() => this.ActivateSelf();
