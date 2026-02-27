@@ -12,7 +12,7 @@ using Mafi.Unity.UiToolkit.Component;
 using Mafi.Unity.UiToolkit.Library;
 using Column = Mafi.Unity.UiToolkit.Library.Column;
 
-namespace ExampleMod;
+namespace ExampleMod.UserInterface.TrainManagement;
 
 public class AllTrainsTab : AbstractTrainTab
 {

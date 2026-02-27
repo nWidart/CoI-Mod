@@ -1,5 +1,4 @@
-﻿using System;
-using Mafi;
+﻿using Mafi;
 using Mafi.Core.Input;
 using Mafi.Core.Trains;
 using Mafi.Localization;
@@ -7,11 +6,9 @@ using Mafi.Unity.Camera;
 using Mafi.Unity.InputControl;
 using Mafi.Unity.Ui;
 using Mafi.Unity.Ui.Trains;
-using Mafi.Unity.UiToolkit.Component;
 using Mafi.Unity.UiToolkit.Library;
-using UnityEngine;
 
-namespace ExampleMod;
+namespace ExampleMod.UserInterface.TrainManagement;
 
 [GlobalDependency(RegistrationMode.AsEverything)]
 public class TrainsUIWindow : Window

@@ -5,7 +5,7 @@ using Mafi.Unity.Ui;
 using Mafi.Unity.Ui.Trains;
 using Column = Mafi.Unity.UiToolkit.Library.Column;
 
-namespace ExampleMod;
+namespace ExampleMod.UserInterface.TrainManagement;
 
 public abstract class AbstractTrainTab: Column
 {

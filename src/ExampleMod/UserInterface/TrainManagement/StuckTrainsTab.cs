@@ -8,7 +8,7 @@ using Mafi.Unity.Ui.Trains;
 using Mafi.Unity.UiToolkit.Component;
 using Mafi.Unity.UiToolkit.Library;
 
-namespace ExampleMod;
+namespace ExampleMod.UserInterface.TrainManagement;
 
 public class StuckTrainsTab: AbstractTrainTab
 {
