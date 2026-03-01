@@ -14,7 +14,8 @@ public class RateCalculatorWindowUi: Window
     private Label _maintenanceLabel;
     private Label _powerLabel;
     private Label _workersLabel;
-    private Column _mainSection;
+    private Column _statsSection;
+    private readonly Panel _overviewPanel;
 
     public RateCalculatorWindowUi() : base(new LocStrFormatted("Rate Calculator"), true)
     {
@@ -24,8 +25,9 @@ public class RateCalculatorWindowUi: Window
         _powerLabel = UiFramework.NewLabel("");
         _workersLabel = UiFramework.NewLabel("");
 
-        _mainSection = UiFramework.StartNewSection(new LocStrFormatted("Stats"));
-        Body.Add(_mainSection);
+        _statsSection = UiFramework.StartNewSection(new LocStrFormatted("Stats"));
+        _overviewPanel = UiFramework.StartNewPanel(new[] { _statsSection });
+        Body.Add(_overviewPanel);
     }
 
     private void RefreshStatsLabels()
@@ -42,8 +44,8 @@ public class RateCalculatorWindowUi: Window
         var powerRow = UiFramework.StartNewRow(new[] { _powerLabel });
         var workersRow = UiFramework.StartNewRow(new[] { _workersLabel });
         
-        _mainSection.Clear();
-        _mainSection.Add(maintRow, powerRow, workersRow);
+        _statsSection.Clear();
+        _statsSection.Add(maintRow, powerRow, workersRow);
     }
 
     private void SetStats(StatsSummery statsSummery)

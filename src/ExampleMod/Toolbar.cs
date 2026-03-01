@@ -7,9 +7,13 @@ using Mafi.Collections.ReadonlyCollections;
 using Mafi.Core;
 using Mafi.Core.Entities;
 using Mafi.Core.Entities.Static;
+using Mafi.Core.Factory.ElectricPower;
 using Mafi.Core.Factory.Machines;
 using Mafi.Core.Factory.Transports;
+using Mafi.Core.Maintenance;
+using Mafi.Core.Population;
 using Mafi.Core.Terrain;
+using Mafi.Core.Trains;
 using Mafi.Core.UiState;
 using Mafi.Localization;
 using Mafi.Unity;
@@ -121,25 +125,29 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
 
         foreach (var selectedEntity in selectedEntities)
         {
-            switch (selectedEntity)
+            if (selectedEntity is IMaintainedEntity maintainedEntity)
             {
-                case Machine machine:
-                    var maintenancePerMonth = machine.Maintenance.Costs.MaintenancePerMonth;
-                    var powerRequired = machine.ElectricityConsumer.Value.PowerRequired;
-                    statsSummery.IncrementTotalMaintenancePerMonth(maintenancePerMonth);
+                var maintenancePerMonth = maintainedEntity.Maintenance.Costs.MaintenancePerMonth;
+                statsSummery.IncrementTotalMaintenancePerMonth(maintenancePerMonth);
+            }
+
+            if (selectedEntity is IElectricityConsumingEntity electricityConsumingEntity)
+            {
+                var electricityConsumerReadonly = electricityConsumingEntity.ElectricityConsumer;
+                if (electricityConsumerReadonly.HasValue)
+                {
+                    var powerRequired = electricityConsumerReadonly.Value.PowerRequired;
                     statsSummery.IncrementTotalPowerRequired(powerRequired);
-                    statsSummery.IncrementTotalWorkersAssigned();
+                }
+            }
 
-                    var entity = this._entitiesManager.GetEntity(machine.Id);
-                    Log.Info($"Machine: {entity.Value.GetTitle()}, maintenance/month: {maintenancePerMonth}, power required: {powerRequired}");
-
-                    break;
+            if (selectedEntity is IEntityWithWorkers entityWithWorkers)
+            {
+                statsSummery.IncrementTotalWorkersAssigned(entityWithWorkers.WorkersNeeded);
             }
         }
 
-        Log.Info("Total maintenance costs/month: " + statsSummery.TotalMaintenancePerMonth);
-        Log.Info("Total power required: " + statsSummery.TotalPowerRequired + " KW");
-        Log.Info("Total workers assigned: " + statsSummery.TotalWorkersAssigned);
+        Log.Info(statsSummery.ToString());
 
         _testWindowController.SetStats(statsSummery);
         _testWindowController.Open();
