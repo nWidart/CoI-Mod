@@ -51,6 +51,13 @@ public class RateCalculatorWindowUi : Window
             .IconValue("Assets/Unity/UserInterface/General/WorkerSmall.svg")
             .ObserveValue(() => _statsSummery.TotalWorkersAssigned);
         var workersRow = UiFramework.StartNewRow(new[] { workersLabel, workersDisplay });
+        
+        var computingLabel = UiFramework.NewLabel("Total computing required: ");
+        UiComponent computingDisplay = new DisplayWithIcon()
+            .IconValue("Assets/Unity/UserInterface/General/Computing128.png")
+            .ObserveValue(() => _statsSummery.ComputingRequired.Format());
+        var computingRow = UiFramework.StartNewRow(new[] { computingLabel, computingDisplay });
+
 
         var tableSection = UiFramework.StartNewSection(new LocStrFormatted("Table"));
         var tableUi = new TableUi.CellRow();
@@ -59,7 +66,7 @@ public class RateCalculatorWindowUi : Window
         tableSection.Add(tableUi);
         
         
-        var statsSection = UiFramework.StartNewSection(new LocStrFormatted("Stats for selection"), new[] {maintenanceRow, powerRow, workersRow });
+        var statsSection = UiFramework.StartNewSection(new LocStrFormatted("Stats for selection"), new[] {maintenanceRow, powerRow, workersRow, computingRow });
         var overviewPanel = UiFramework.StartNewPanel(new[] { statsSection, tableSection });
         Body.Add(overviewPanel);
     }
@@ -79,6 +86,7 @@ public class RateCalculatorWindowUi : Window
         public void SetStats(StatsSummery statsSummery)
         {
             Window.SetStats(statsSummery);
+            Log.Info(statsSummery.ComputingRequired.ToString());
         }
     }
 }

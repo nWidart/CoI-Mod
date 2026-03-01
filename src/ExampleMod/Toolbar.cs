@@ -7,6 +7,7 @@ using Mafi.Collections.ReadonlyCollections;
 using Mafi.Core;
 using Mafi.Core.Entities;
 using Mafi.Core.Entities.Static;
+using Mafi.Core.Factory.ComputingPower;
 using Mafi.Core.Factory.ElectricPower;
 using Mafi.Core.Factory.Machines;
 using Mafi.Core.Factory.Transports;
@@ -160,6 +161,11 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
             if (selectedEntity is IEntityWithWorkers entityWithWorkers)
             {
                 statsSummery.IncrementTotalWorkersAssigned(entityWithWorkers.WorkersNeeded);
+            }
+
+            if (selectedEntity is IComputingConsumingEntity computingConsumer)
+            {
+                statsSummery.IncrementComputingRequired(computingConsumer.ComputingRequired);
             }
 
             if (selectedEntity is Machine machine)
