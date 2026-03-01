@@ -14,7 +14,8 @@ public class RateCalculatorWindowUi: Window
     private Label _maintenanceLabel;
     private Label _powerLabel;
     private Label _workersLabel;
-    
+    private Column _mainSection;
+
     public RateCalculatorWindowUi() : base(new LocStrFormatted("Rate Calculator"), true)
     {
         WindowSize(1000.px(), 900.px());
@@ -22,16 +23,9 @@ public class RateCalculatorWindowUi: Window
         _maintenanceLabel = UiFramework.NewLabel("");
         _powerLabel = UiFramework.NewLabel("");
         _workersLabel = UiFramework.NewLabel("");
-        
-        Body.Add(UiFramework.StartNewSection(new LocStrFormatted("Stats"), new[]
-        {
-            UiFramework.StartNewRow(new[]
-            {
-                _maintenanceLabel,
-                _powerLabel,
-                _workersLabel
-            })
-        }));
+
+        _mainSection = UiFramework.StartNewSection(new LocStrFormatted("Stats"));
+        Body.Add(_mainSection);
     }
 
     private void RefreshStatsLabels()
@@ -43,6 +37,12 @@ public class RateCalculatorWindowUi: Window
         _maintenanceLabel = UiFramework.NewLabel($"Total maintenance costs/month: {maintenance}");
         _powerLabel = UiFramework.NewLabel($"Total power required: {power} KW");
         _workersLabel = UiFramework.NewLabel($"Total workers assigned: {workers}");
+
+        var maintRow = UiFramework.StartNewRow(new[] { _maintenanceLabel });
+        var powerRow = UiFramework.StartNewRow(new[] { _powerLabel });
+        var workersRow = UiFramework.StartNewRow(new[] { _workersLabel });
+        
+        _mainSection.Add(maintRow, powerRow, workersRow);
     }
 
     private void SetStats(StatsSummery statsSummery)
