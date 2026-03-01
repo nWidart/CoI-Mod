@@ -1,13 +1,11 @@
 using System;
 using ExampleMod.UserInterface.Framework;
 using Mafi;
-using Mafi.Core;
 using Mafi.Localization;
 using Mafi.Unity.InputControl;
 using Mafi.Unity.Ui.Library;
 using Mafi.Unity.UiToolkit.Component;
 using Mafi.Unity.UiToolkit.Library;
-using Mafi.Unity.UiToolkit.Themes;
 
 namespace ExampleMod.UserInterface.RateCalculator;
 
@@ -23,10 +21,28 @@ public class RateCalculatorWindowUi : Window
 
     public RateCalculatorWindowUi() : base(new LocStrFormatted("Rate Calculator"), true)
     {
-        WindowSize(1000.px(), 900.px());
+        WindowSize(1000.px(), Px.Auto);
         MakeMovable();
         EnablePinning();
+
+        var tableSection = UiFramework.StartNewSection(new LocStrFormatted("Table"));
+        var tableUi = new TableUi.CellRow();
+        tableUi.Add(c => c.JustifyItemsCenter().MinHeight(34.px()).Hide());
+        tableUi.Add(new Label("No data yet".AsLoc()).FontItalic());
+        tableSection.Add(tableUi);
         
+        var statsPanel = UiFramework.StartNewPanel(new[] { GetStatsSection() });
+        var tablePanel = UiFramework.StartNewPanel(new[] { tableSection });
+        
+        var ingredientsPanel = UiFramework.StartNewPanel(new [] { UiFramework.StartNewSection("Ingredients".AsLoc())});
+        var productsPanel = UiFramework.StartNewPanel(new [] { UiFramework.StartNewSection("Products".AsLoc())});
+        var intermediatesPanel = UiFramework.StartNewPanel(new [] { UiFramework.StartNewSection("Intermediates".AsLoc())});
+        
+        Body.Add(statsPanel, tablePanel, ingredientsPanel, productsPanel, intermediatesPanel);
+    }
+
+    private Column GetStatsSection()
+    {
         var maintenanceLabel = UiFramework.NewLabel("Total maintenance costs/month:");
         UiComponent maintenance1Display = new DisplayWithIcon()
             .IconValue("Assets/Base/Products/Icons/Maintenance1.svg")
@@ -57,18 +73,8 @@ public class RateCalculatorWindowUi : Window
             .IconValue("Assets/Unity/UserInterface/General/Computing128.png")
             .ObserveValue(() => _statsSummery.ComputingRequired.Format());
         var computingRow = UiFramework.StartNewRow(new[] { computingLabel, computingDisplay });
-
-
-        var tableSection = UiFramework.StartNewSection(new LocStrFormatted("Table"));
-        var tableUi = new TableUi.CellRow();
-        tableUi.Add(c => c.JustifyItemsCenter().MinHeight(34.px()).Hide());
-        tableUi.Add(new Label("No data yet".AsLoc()).FontItalic());
-        tableSection.Add(tableUi);
         
-        
-        var statsSection = UiFramework.StartNewSection(new LocStrFormatted("Stats for selection"), new[] {maintenanceRow, powerRow, workersRow, computingRow });
-        var overviewPanel = UiFramework.StartNewPanel(new[] { statsSection, tableSection });
-        Body.Add(overviewPanel);
+        return UiFramework.StartNewSection(new LocStrFormatted("Statistics"), new[] {maintenanceRow, powerRow, workersRow, computingRow });
     }
 
     [GlobalDependency(RegistrationMode.AsEverything)]

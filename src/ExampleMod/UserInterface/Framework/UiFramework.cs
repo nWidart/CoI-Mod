@@ -13,9 +13,11 @@ public class UiFramework
     {
         var panel = new Panel();
         panel.Body.PaddingTopBottom(2.pt());
+        panel.Body.Gap(10.px());
         panel.Body.Add(children);
         return panel;   
     }
+    
     public static Column StartNewSection(LocStrFormatted title)
     {
         var component = new Column(2.pt())
