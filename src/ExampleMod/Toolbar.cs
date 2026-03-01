@@ -38,7 +38,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
     private readonly EntitiesManager _entitiesManager;
     private readonly ProtosDb _protoDb;
     private readonly StatsSummeryService _statsSummeryService;
-    private readonly RateCalculatorWindowUi.Controller _testWindowController;
+    private readonly RateCalculatorWindowUi.Controller _rateCalculatorWindowController;
     private readonly IUnityInputMgr InputManager;
     protected readonly Toolbox Toolbox;
 
@@ -61,7 +61,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         HudStateManager hudState,
         ProtosDb protoDb,
         StatsSummeryService statsSummeryService,
-        RateCalculatorWindowUi.Controller testWindowController
+        RateCalculatorWindowUi.Controller rateCalculatorWindowController
     ) : base(toolbar,
         context,
         cursorPickingManager,
@@ -80,7 +80,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         _entitiesManager = entitiesManager;
         _protoDb = protoDb;
         _statsSummeryService = statsSummeryService;
-        _testWindowController = testWindowController;
+        _rateCalculatorWindowController = rateCalculatorWindowController;
 
         InputManager = context.InputMgr;
         Toolbox = toolbar.CreateToolbox();
@@ -125,7 +125,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
     {
         var statsSummery = _statsSummeryService.GenerateFor(selectedEntities);
 
-        _testWindowController.SetStats(statsSummery);
-        _testWindowController.Open();
+        _rateCalculatorWindowController.SetStats(statsSummery);
+        _rateCalculatorWindowController.Open();
     }
 }
