@@ -86,7 +86,6 @@ public class RateCalculatorWindowUi : Window
         public void SetStats(StatsSummery statsSummery)
         {
             Window.SetStats(statsSummery);
-            Log.Info(statsSummery.ComputingRequired.ToString());
         }
     }
 }
