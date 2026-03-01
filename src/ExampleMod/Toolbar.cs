@@ -13,6 +13,7 @@ using Mafi.Core.Factory.Machines;
 using Mafi.Core.Factory.Transports;
 using Mafi.Core.Maintenance;
 using Mafi.Core.Population;
+using Mafi.Core.Products;
 using Mafi.Core.Prototypes;
 using Mafi.Core.Terrain;
 using Mafi.Core.Trains;
@@ -126,6 +127,9 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         ImmutableArray<TileSurfaceCopyPasteData> selectedSurfaces, ImmutableArray<TileSurfaceCopyPasteData> selectedDecals, bool isAreaSelection,
         bool isLeftMouse, RectangleTerrainArea2i? area)
     {
+        var maintT1 = _protoDb.Get<ProductProto>(Mafi.Base.Ids.Products.MaintenanceT1).Value;
+        var maintT2 = _protoDb.Get<ProductProto>(Mafi.Base.Ids.Products.MaintenanceT2).Value;
+        var maintT3 = _protoDb.Get<ProductProto>(Mafi.Base.Ids.Products.MaintenanceT3).Value;
         var statsSummery = new StatsSummery();
         
         foreach (var selectedEntity in selectedEntities)
@@ -134,15 +138,15 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
             {
                 var maintenancePerMonth = maintainedEntity.Maintenance.Costs.MaintenancePerMonth;
                 
-                if (maintainedEntity.Maintenance.Costs.Product.Id.ToString().Contains("MaintenanceT1"))
+                if (maintainedEntity.Maintenance.Costs.Product.Id.Equals(maintT1.Id))
                 {
                     statsSummery.IncrementTotalMaintenance1PerMonth(maintenancePerMonth);
                 }
-                if (maintainedEntity.Maintenance.Costs.Product.Id.ToString().Contains("MaintenanceT2"))
+                if (maintainedEntity.Maintenance.Costs.Product.Id.Equals(maintT2.Id))
                 {
                     statsSummery.IncrementTotalMaintenance2PerMonth(maintenancePerMonth);
                 }
-                if (maintainedEntity.Maintenance.Costs.Product.Id.ToString().Contains("MaintenanceT3"))
+                if (maintainedEntity.Maintenance.Costs.Product.Id.Equals(maintT3.Id))
                 {
                     statsSummery.IncrementTotalMaintenance3PerMonth(maintenancePerMonth);
                 }
