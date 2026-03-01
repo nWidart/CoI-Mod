@@ -7,16 +7,9 @@ using Mafi.Collections.ReadonlyCollections;
 using Mafi.Core;
 using Mafi.Core.Entities;
 using Mafi.Core.Entities.Static;
-using Mafi.Core.Factory.ComputingPower;
-using Mafi.Core.Factory.ElectricPower;
-using Mafi.Core.Factory.Machines;
 using Mafi.Core.Factory.Transports;
-using Mafi.Core.Maintenance;
-using Mafi.Core.Population;
-using Mafi.Core.Products;
 using Mafi.Core.Prototypes;
 using Mafi.Core.Terrain;
-using Mafi.Core.Trains;
 using Mafi.Core.UiState;
 using Mafi.Localization;
 using Mafi.Unity;
@@ -44,6 +37,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
 {
     private readonly EntitiesManager _entitiesManager;
     private readonly ProtosDb _protoDb;
+    private readonly StatsSummeryService _statsSummeryService;
     private readonly RateCalculatorWindowUi.Controller _testWindowController;
     private readonly IUnityInputMgr InputManager;
     protected readonly Toolbox Toolbox;
@@ -66,6 +60,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         TrackDirectionRenderer trackDirectionRenderer,
         HudStateManager hudState,
         ProtosDb protoDb,
+        StatsSummeryService statsSummeryService,
         RateCalculatorWindowUi.Controller testWindowController
     ) : base(toolbar,
         context,
@@ -84,6 +79,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
     {
         _entitiesManager = entitiesManager;
         _protoDb = protoDb;
+        _statsSummeryService = statsSummeryService;
         _testWindowController = testWindowController;
 
         InputManager = context.InputMgr;
@@ -127,64 +123,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         ImmutableArray<TileSurfaceCopyPasteData> selectedSurfaces, ImmutableArray<TileSurfaceCopyPasteData> selectedDecals, bool isAreaSelection,
         bool isLeftMouse, RectangleTerrainArea2i? area)
     {
-        var maintT1 = _protoDb.Get<ProductProto>(Mafi.Base.Ids.Products.MaintenanceT1).Value;
-        var maintT2 = _protoDb.Get<ProductProto>(Mafi.Base.Ids.Products.MaintenanceT2).Value;
-        var maintT3 = _protoDb.Get<ProductProto>(Mafi.Base.Ids.Products.MaintenanceT3).Value;
-        var statsSummery = new StatsSummery();
-        
-        foreach (var selectedEntity in selectedEntities)
-        {
-            if (selectedEntity is IMaintainedEntity maintainedEntity)
-            {
-                var maintenancePerMonth = maintainedEntity.Maintenance.Costs.MaintenancePerMonth;
-                
-                if (maintainedEntity.Maintenance.Costs.Product.Id.Equals(maintT1.Id))
-                {
-                    statsSummery.IncrementTotalMaintenance1PerMonth(maintenancePerMonth);
-                }
-                if (maintainedEntity.Maintenance.Costs.Product.Id.Equals(maintT2.Id))
-                {
-                    statsSummery.IncrementTotalMaintenance2PerMonth(maintenancePerMonth);
-                }
-                if (maintainedEntity.Maintenance.Costs.Product.Id.Equals(maintT3.Id))
-                {
-                    statsSummery.IncrementTotalMaintenance3PerMonth(maintenancePerMonth);
-                }
-            }
-
-            if (selectedEntity is IElectricityConsumingEntity electricityConsumingEntity)
-            {
-                var electricityConsumerReadonly = electricityConsumingEntity.ElectricityConsumer;
-                if (electricityConsumerReadonly.HasValue)
-                {
-                    var powerRequired = electricityConsumerReadonly.Value.PowerRequired;
-                    statsSummery.IncrementTotalPowerRequired(powerRequired);
-                }
-            }
-
-            if (selectedEntity is IEntityWithWorkers entityWithWorkers)
-            {
-                statsSummery.IncrementTotalWorkersAssigned(entityWithWorkers.WorkersNeeded);
-            }
-
-            if (selectedEntity is IComputingConsumingEntity computingConsumer)
-            {
-                statsSummery.IncrementComputingRequired(computingConsumer.ComputingRequired);
-            }
-
-            if (selectedEntity is Machine machine)
-            {
-                foreach (var recipeProto in machine.RecipesAssigned.AsEnumerable())
-                {
-                    foreach (var recipeInput in recipeProto.AllInputs.AsIndexable)
-                    {
-
-                        machine.GetInputQuantityFor(recipeInput.Product);
-                    }
-                }
-
-            }
-        }
+        var statsSummery = _statsSummeryService.GenerateFor(selectedEntities);
 
         _testWindowController.SetStats(statsSummery);
         _testWindowController.Open();
