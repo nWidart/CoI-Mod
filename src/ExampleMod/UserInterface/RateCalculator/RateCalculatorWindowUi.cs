@@ -1,61 +1,64 @@
+using System;
 using ExampleMod.UserInterface.Framework;
 using Mafi;
+using Mafi.Core;
 using Mafi.Localization;
 using Mafi.Unity.InputControl;
+using Mafi.Unity.Ui.Library;
+using Mafi.Unity.UiToolkit.Component;
 using Mafi.Unity.UiToolkit.Library;
+using Mafi.Unity.UiToolkit.Themes;
 
 namespace ExampleMod.UserInterface.RateCalculator;
 
 [GlobalDependency(RegistrationMode.AsEverything)]
-public class RateCalculatorWindowUi: Window
+public class RateCalculatorWindowUi : Window
 {
     private StatsSummery _statsSummery;
-    
-    private Label _maintenanceLabel;
-    private Label _powerLabel;
-    private Label _workersLabel;
-    private Column _statsSection;
-    private readonly Panel _overviewPanel;
 
     public RateCalculatorWindowUi() : base(new LocStrFormatted("Rate Calculator"), true)
     {
         WindowSize(1000.px(), 900.px());
+        MakeMovable();
+        EnablePinning();
         
-        _maintenanceLabel = UiFramework.NewLabel("");
-        _powerLabel = UiFramework.NewLabel("");
-        _workersLabel = UiFramework.NewLabel("");
+        var maintenanceLabel = UiFramework.NewLabel("Total maintenance costs/month:");
+        UiComponent maintenanceDisplay = new DisplayWithIcon()
+            .IconValue("Assets/Base/Products/Icons/Maintenance1.svg")
+            .ObserveValue(() => _statsSummery.TotalMaintenancePerMonth.ToStringRounded());
+        var maintenanceRow = UiFramework.StartNewRow(new[] { maintenanceLabel, maintenanceDisplay });
 
-        _statsSection = UiFramework.StartNewSection(new LocStrFormatted("Stats"));
-        _overviewPanel = UiFramework.StartNewPanel(new[] { _statsSection });
-        Body.Add(_overviewPanel);
-    }
-
-    private void RefreshStatsLabels()
-    {
-        var maintenance = _statsSummery.TotalMaintenancePerMonth.ToString();
-        var power = _statsSummery.TotalPowerRequired.ToString();
-        var workers = _statsSummery.TotalWorkersAssigned.ToString();
+        var powerLabel = UiFramework.NewLabel("Total power required: ");
+        UiComponent powerDisplay = new DisplayWithIcon()
+            .IconValue("Assets/Unity/UserInterface/General/Electricity.svg")
+            .ObserveValue(() => _statsSummery.TotalPowerRequired.Format());
+        var powerRow = UiFramework.StartNewRow(new[] { powerLabel, powerDisplay });
         
-        _maintenanceLabel = UiFramework.NewLabel($"Total maintenance costs/month: {maintenance}");
-        _powerLabel = UiFramework.NewLabel($"Total power required: {power} KW");
-        _workersLabel = UiFramework.NewLabel($"Total workers assigned: {workers}");
+        var workersLabel = UiFramework.NewLabel("Total workers required: ");
+        UiComponent workersDisplay = new DisplayWithIcon()
+            .IconValue("Assets/Unity/UserInterface/General/WorkerSmall.svg")
+            .ObserveValue(() => _statsSummery.TotalWorkersAssigned);
+        var workersRow = UiFramework.StartNewRow(new[] { workersLabel, workersDisplay });
 
-        var maintRow = UiFramework.StartNewRow(new[] { _maintenanceLabel });
-        var powerRow = UiFramework.StartNewRow(new[] { _powerLabel });
-        var workersRow = UiFramework.StartNewRow(new[] { _workersLabel });
+        var tableSection = UiFramework.StartNewSection(new LocStrFormatted("Table"));
+        var tableUi = new TableUi.CellRow();
+        tableUi.Add(c => c.JustifyItemsCenter().MinHeight(34.px()).Hide());
+        tableUi.Add(new Label("No data yet".AsLoc()).FontItalic());
+        tableSection.Add(tableUi);
         
-        _statsSection.Clear();
-        _statsSection.Add(maintRow, powerRow, workersRow);
+        
+        var statsSection = UiFramework.StartNewSection(new LocStrFormatted("Stats for selection"), new[] {maintenanceRow, powerRow, workersRow });
+        var overviewPanel = UiFramework.StartNewPanel(new[] { statsSection, tableSection });
+        Body.Add(overviewPanel);
     }
 
     private void SetStats(StatsSummery statsSummery)
     {
         _statsSummery = statsSummery;
-        RefreshStatsLabels();
     }
 
     [GlobalDependency(RegistrationMode.AsEverything)]
-    public class Controller: WindowController<RateCalculatorWindowUi>
+    public class Controller : WindowController<RateCalculatorWindowUi>
     {
         public Controller(ControllerContext controllerContext) : base(controllerContext)
         {
@@ -63,7 +66,7 @@ public class RateCalculatorWindowUi: Window
             controllerContext.InputManager
                 .RegisterGlobalShortcut(_ => ShortcutsMap.Instance.OpenRateCalcWindow, this);
         }
-        
+
         public void Open() => ActivateSelf();
 
         public void SetStats(StatsSummery statsSummery)

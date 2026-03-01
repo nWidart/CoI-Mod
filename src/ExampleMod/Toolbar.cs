@@ -145,9 +145,20 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
             {
                 statsSummery.IncrementTotalWorkersAssigned(entityWithWorkers.WorkersNeeded);
             }
-        }
 
-        Log.Info(statsSummery.ToString());
+            if (selectedEntity is Machine machine)
+            {
+                foreach (var recipeProto in machine.RecipesAssigned.AsEnumerable())
+                {
+                    foreach (var recipeInput in recipeProto.AllInputs.AsIndexable)
+                    {
+
+                        machine.GetInputQuantityFor(recipeInput.Product);
+                    }
+                }
+
+            }
+        }
 
         _testWindowController.SetStats(statsSummery);
         _testWindowController.Open();

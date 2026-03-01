@@ -14,5 +14,5 @@ public class ShortcutsMap
     public KeyBindings OpenRateCalcWindow { get; set; } = KeyBindings.FromKey(KbCategory.Tools, ShortcutMode.Game, KeyCode.F9);
     
     [Kb(KbCategory.Tools, "calc", "calc", "calc", true, false)]
-    public KeyBindings OpenCalc { get; set; } = KeyBindings.FromKey(KbCategory.Tools, ShortcutMode.Game, KeyCode.Colon);
+    public KeyBindings OpenCalc { get; set; } = KeyBindings.FromKey(KbCategory.Tools, ShortcutMode.Game, KeyCode.Y);
 }
