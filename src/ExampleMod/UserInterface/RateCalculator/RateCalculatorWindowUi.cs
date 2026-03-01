@@ -42,6 +42,7 @@ public class RateCalculatorWindowUi: Window
         var powerRow = UiFramework.StartNewRow(new[] { _powerLabel });
         var workersRow = UiFramework.StartNewRow(new[] { _workersLabel });
         
+        _mainSection.Clear();
         _mainSection.Add(maintRow, powerRow, workersRow);
     }
 
