@@ -1,5 +1,5 @@
 using System;
-using ExampleMod.UserInterface.TestWindow;
+using ExampleMod.UserInterface.RateCalculator;
 using Mafi;
 using Mafi.Collections;
 using Mafi.Collections.ImmutableCollections;
@@ -9,8 +9,6 @@ using Mafi.Core.Entities;
 using Mafi.Core.Entities.Static;
 using Mafi.Core.Factory.Machines;
 using Mafi.Core.Factory.Transports;
-using Mafi.Core.Population;
-using Mafi.Core.Prototypes;
 using Mafi.Core.Terrain;
 using Mafi.Core.UiState;
 using Mafi.Localization;
@@ -30,7 +28,6 @@ using Mafi.Unity.Ui.Hud;
 using Mafi.Unity.Ui.Library;
 using Mafi.Unity.UiStatic;
 using Mafi.Unity.UiStatic.Cursors;
-using Mafi.Unity.UiStatic.Toolbar;
 using Mafi.Unity.UiToolkit.Component;
 
 namespace ExampleMod;
@@ -42,7 +39,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
     private readonly RateCalculatorWindowUi.Controller _testWindowController;
     private readonly IUnityInputMgr InputManager;
     protected readonly Toolbox Toolbox;
-    
+
     public Toolbar(
         ToolbarHud toolbar,
         UiContext context,
@@ -59,9 +56,9 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         TransportBuildController transportBuildController,
         TrainTrackBuildController trainTrackBuildController,
         TrackDirectionRenderer trackDirectionRenderer,
-            HudStateManager hudState,
+        HudStateManager hudState,
         RateCalculatorWindowUi.Controller testWindowController
-        ) : base(toolbar,
+    ) : base(toolbar,
         context,
         cursorPickingManager,
         cursorManager,
@@ -89,8 +86,6 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         InputManager.RegisterGlobalShortcut(map => ShortcutsMap.Instance.OpenCalc, this);
     }
 
-
-
     public override void Activate()
     {
         this.Toolbox.Show();
@@ -108,6 +103,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
             case TransportPillar _:
                 return false;
         }
+
         return true;
     }
 
@@ -117,7 +113,8 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         return true;
     }
 
-    protected override void OnEntitiesSelected(IIndexable<IStaticEntity> selectedEntities, IIndexable<SubTransport> selectedPartialTransports, ImmutableArray<TileSurfaceCopyPasteData> selectedSurfaces, ImmutableArray<TileSurfaceCopyPasteData> selectedDecals, bool isAreaSelection,
+    protected override void OnEntitiesSelected(IIndexable<IStaticEntity> selectedEntities, IIndexable<SubTransport> selectedPartialTransports,
+        ImmutableArray<TileSurfaceCopyPasteData> selectedSurfaces, ImmutableArray<TileSurfaceCopyPasteData> selectedDecals, bool isAreaSelection,
         bool isLeftMouse, RectangleTerrainArea2i? area)
     {
         var statsSummery = new StatsSummery();
@@ -135,15 +132,15 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
 
                     var entity = this._entitiesManager.GetEntity(machine.Id);
                     Log.Info($"Machine: {entity.Value.GetTitle()}, maintenance/month: {maintenancePerMonth}, power required: {powerRequired}");
-                    
+
                     break;
             }
         }
-        
+
         Log.Info("Total maintenance costs/month: " + statsSummery.TotalMaintenancePerMonth);
         Log.Info("Total power required: " + statsSummery.TotalPowerRequired + " KW");
         Log.Info("Total workers assigned: " + statsSummery.TotalWorkersAssigned);
-        
+
         _testWindowController.SetStats(statsSummery);
         _testWindowController.Open();
     }

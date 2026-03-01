@@ -4,7 +4,7 @@ using Mafi.Localization;
 using Mafi.Unity.InputControl;
 using Mafi.Unity.UiToolkit.Library;
 
-namespace ExampleMod.UserInterface.TestWindow;
+namespace ExampleMod.UserInterface.RateCalculator;
 
 [GlobalDependency(RegistrationMode.AsEverything)]
 public class RateCalculatorWindowUi: Window
