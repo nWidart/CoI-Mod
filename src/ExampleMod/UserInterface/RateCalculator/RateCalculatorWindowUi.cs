@@ -16,6 +16,11 @@ public class RateCalculatorWindowUi : Window
 {
     private StatsSummery _statsSummery;
 
+    private void SetStats(StatsSummery statsSummery)
+    {
+        _statsSummery = statsSummery;
+    }
+
     public RateCalculatorWindowUi() : base(new LocStrFormatted("Rate Calculator"), true)
     {
         WindowSize(1000.px(), 900.px());
@@ -23,14 +28,21 @@ public class RateCalculatorWindowUi : Window
         EnablePinning();
         
         var maintenanceLabel = UiFramework.NewLabel("Total maintenance costs/month:");
-        UiComponent maintenanceDisplay = new DisplayWithIcon()
+        UiComponent maintenance1Display = new DisplayWithIcon()
             .IconValue("Assets/Base/Products/Icons/Maintenance1.svg")
-            .ObserveValue(() => _statsSummery.TotalMaintenancePerMonth.ToStringRounded());
-        var maintenanceRow = UiFramework.StartNewRow(new[] { maintenanceLabel, maintenanceDisplay });
+            .ObserveValue(() => _statsSummery.TotalMaintenance1PerMonth.ToStringRounded());
+        UiComponent maintenance2Display = new DisplayWithIcon()
+            .IconValue("Assets/Base/Products/Icons/Maintenance2.svg")
+            .ObserveValue(() => _statsSummery.TotalMaintenance2PerMonth.ToStringRounded());
+        UiComponent maintenance3Display = new DisplayWithIcon()
+            .IconValue("Assets/Base/Products/Icons/Maintenance3.svg")
+            .ObserveValue(() => _statsSummery.TotalMaintenance3PerMonth.ToStringRounded());
+        var maintenanceRow = UiFramework.StartNewRow(new[] { maintenanceLabel, maintenance1Display, maintenance2Display, maintenance3Display });
 
         var powerLabel = UiFramework.NewLabel("Total power required: ");
         UiComponent powerDisplay = new DisplayWithIcon()
             .IconValue("Assets/Unity/UserInterface/General/Electricity.svg")
+            .Tooltip("Total power required to run selection".AsLoc())
             .ObserveValue(() => _statsSummery.TotalPowerRequired.Format());
         var powerRow = UiFramework.StartNewRow(new[] { powerLabel, powerDisplay });
         
@@ -50,11 +62,6 @@ public class RateCalculatorWindowUi : Window
         var statsSection = UiFramework.StartNewSection(new LocStrFormatted("Stats for selection"), new[] {maintenanceRow, powerRow, workersRow });
         var overviewPanel = UiFramework.StartNewPanel(new[] { statsSection, tableSection });
         Body.Add(overviewPanel);
-    }
-
-    private void SetStats(StatsSummery statsSummery)
-    {
-        _statsSummery = statsSummery;
     }
 
     [GlobalDependency(RegistrationMode.AsEverything)]

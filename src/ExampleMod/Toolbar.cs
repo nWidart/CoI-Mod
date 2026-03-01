@@ -12,6 +12,7 @@ using Mafi.Core.Factory.Machines;
 using Mafi.Core.Factory.Transports;
 using Mafi.Core.Maintenance;
 using Mafi.Core.Population;
+using Mafi.Core.Prototypes;
 using Mafi.Core.Terrain;
 using Mafi.Core.Trains;
 using Mafi.Core.UiState;
@@ -40,6 +41,7 @@ namespace ExampleMod;
 public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
 {
     private readonly EntitiesManager _entitiesManager;
+    private readonly ProtosDb _protoDb;
     private readonly RateCalculatorWindowUi.Controller _testWindowController;
     private readonly IUnityInputMgr InputManager;
     protected readonly Toolbox Toolbox;
@@ -61,6 +63,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         TrainTrackBuildController trainTrackBuildController,
         TrackDirectionRenderer trackDirectionRenderer,
         HudStateManager hudState,
+        ProtosDb protoDb,
         RateCalculatorWindowUi.Controller testWindowController
     ) : base(toolbar,
         context,
@@ -78,6 +81,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
             nameof(Toolbar)))
     {
         _entitiesManager = entitiesManager;
+        _protoDb = protoDb;
         _testWindowController = testWindowController;
 
         InputManager = context.InputMgr;
@@ -122,13 +126,25 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         bool isLeftMouse, RectangleTerrainArea2i? area)
     {
         var statsSummery = new StatsSummery();
-
+        
         foreach (var selectedEntity in selectedEntities)
         {
             if (selectedEntity is IMaintainedEntity maintainedEntity)
             {
                 var maintenancePerMonth = maintainedEntity.Maintenance.Costs.MaintenancePerMonth;
-                statsSummery.IncrementTotalMaintenancePerMonth(maintenancePerMonth);
+                
+                if (maintainedEntity.Maintenance.Costs.Product.Id.ToString().Contains("MaintenanceT1"))
+                {
+                    statsSummery.IncrementTotalMaintenance1PerMonth(maintenancePerMonth);
+                }
+                if (maintainedEntity.Maintenance.Costs.Product.Id.ToString().Contains("MaintenanceT2"))
+                {
+                    statsSummery.IncrementTotalMaintenance2PerMonth(maintenancePerMonth);
+                }
+                if (maintainedEntity.Maintenance.Costs.Product.Id.ToString().Contains("MaintenanceT3"))
+                {
+                    statsSummery.IncrementTotalMaintenance3PerMonth(maintenancePerMonth);
+                }
             }
 
             if (selectedEntity is IElectricityConsumingEntity electricityConsumingEntity)
