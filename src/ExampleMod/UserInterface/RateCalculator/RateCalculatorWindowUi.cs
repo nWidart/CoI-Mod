@@ -58,7 +58,7 @@ public class RateCalculatorWindowUi: Window
         {
             controllerContext.UiRoot.AddDependency(this);
             controllerContext.InputManager
-                .RegisterGlobalShortcut(_ => ShortcutsMap.Instance.OpenTestWindow, this);
+                .RegisterGlobalShortcut(_ => ShortcutsMap.Instance.OpenRateCalcWindow, this);
         }
         
         public void Open() => ActivateSelf();

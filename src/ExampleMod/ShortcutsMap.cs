@@ -11,7 +11,7 @@ public class ShortcutsMap
     public KeyBindings OpenTrainsWindow { get; set; } = KeyBindings.FromKey(KbCategory.Tools, ShortcutMode.Game, KeyCode.F8);
     
     [Kb(KbCategory.Tools, "openTestWindow", "Test Window", "Test Window", true, false)]
-    public KeyBindings OpenTestWindow { get; set; } = KeyBindings.FromKey(KbCategory.Tools, ShortcutMode.Game, KeyCode.F9);
+    public KeyBindings OpenRateCalcWindow { get; set; } = KeyBindings.FromKey(KbCategory.Tools, ShortcutMode.Game, KeyCode.F9);
     
     [Kb(KbCategory.Tools, "calc", "calc", "calc", true, false)]
     public KeyBindings OpenCalc { get; set; } = KeyBindings.FromKey(KbCategory.Tools, ShortcutMode.Game, KeyCode.Colon);
