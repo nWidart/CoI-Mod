@@ -137,34 +137,33 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
 
         foreach (var selectedEntity in selectedEntities)
         {
-            if (selectedEntity is Machine machine)
+            if (selectedEntity is not Machine machine) continue;
+            
+            foreach (var recipeProto in machine.RecipesAssigned.AsEnumerable())
             {
-                foreach (var recipeProto in machine.RecipesAssigned.AsEnumerable())
+                var multiplier = Duration.OneMonth.Ticks / recipeProto.Duration.Ticks.ToFix32();
+
+                foreach (var recipeInput in recipeProto.AllInputs.AsEnumerable())
                 {
-                    var multiplier = Duration.OneMonth.Ticks / recipeProto.Duration.Ticks.ToFix32();
-
-                    foreach (var recipeInput in recipeProto.AllInputs.AsEnumerable())
+                    if (inputDic.TryGetValue(recipeInput.Product, out var existing))
                     {
-                        if (inputDic.TryGetValue(recipeInput.Product, out var existing))
-                        {
-                            inputDic[recipeInput.Product] = existing + recipeInput.Quantity.Value * multiplier;
-                        }
-                        else
-                        {
-                            inputDic.Add(recipeInput.Product, recipeInput.Quantity.Value * multiplier);
-                        }
+                        inputDic[recipeInput.Product] = existing + recipeInput.Quantity.Value * multiplier;
                     }
-
-                    foreach (var recipeOutput in recipeProto.AllOutputs.AsEnumerable())
+                    else
                     {
-                        if (outputDic.TryGetValue(recipeOutput.Product, out var existing))
-                        {
-                            outputDic[recipeOutput.Product] = existing + recipeOutput.Quantity.Value * multiplier;
-                        }
-                        else
-                        {
-                            outputDic.Add(recipeOutput.Product, recipeOutput.Quantity.Value * multiplier);
-                        }
+                        inputDic.Add(recipeInput.Product, recipeInput.Quantity.Value * multiplier);
+                    }
+                }
+
+                foreach (var recipeOutput in recipeProto.AllOutputs.AsEnumerable())
+                {
+                    if (outputDic.TryGetValue(recipeOutput.Product, out var existing))
+                    {
+                        outputDic[recipeOutput.Product] = existing + recipeOutput.Quantity.Value * multiplier;
+                    }
+                    else
+                    {
+                        outputDic.Add(recipeOutput.Product, recipeOutput.Quantity.Value * multiplier);
                     }
                 }
             }
