@@ -70,33 +70,6 @@ public class StatsSummeryService
             {
                 statsSummery.IncrementComputingRequired(computingConsumer.ComputingRequired);
             }
-
-            if (selectedEntity is Machine machine)
-            {
-                foreach (var recipeProto in machine.RecipesAssigned.AsEnumerable())
-                {
-                    foreach (var recipeInput in recipeProto.AllInputs.AsEnumerable())
-                    {
-                        var inputCapacityFor = machine.GetInputCapacityFor(recipeInput.Product);
-                        var inputQuantityFor = machine.GetInputQuantityFor(recipeInput.Product);
-                        Log.Info("RecipeInout" + recipeInput.Product.Id + " | " + recipeInput.Quantity);
-                        Log.Info("inputCapacityFor: " + inputCapacityFor + " | inputQuantityFor: " + inputQuantityFor);
-                    }
-
-                    foreach (var recipeOutput in recipeProto.AllOutputs)
-                    {
-                        var outputCapacityFor = machine.GetOutputCapacityFor(recipeOutput.Product);
-                        var outputQuantityFor = machine.GetOutputQuantityFor(recipeOutput.Product);
-                        Log.Info("RecipeOut" + recipeOutput.Product.Id + " | " + recipeOutput.Quantity);
-                        Log.Info("outputCapacityFor: " + outputCapacityFor + " | outputQuantityFor: " + outputQuantityFor);
-                    }
-                }
-            }
-
-            if (selectedEntity is Transport transport)
-            {
-                Log.Info("Transport: " + transport);
-            }
         }
 
         return statsSummery;

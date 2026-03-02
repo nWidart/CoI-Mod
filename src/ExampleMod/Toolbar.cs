@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using ExampleMod.UserInterface.RateCalculator;
 using Mafi;
 using Mafi.Collections;
@@ -7,7 +9,10 @@ using Mafi.Collections.ReadonlyCollections;
 using Mafi.Core;
 using Mafi.Core.Entities;
 using Mafi.Core.Entities.Static;
+using Mafi.Core.Factory.Machines;
+using Mafi.Core.Factory.Recipes;
 using Mafi.Core.Factory.Transports;
+using Mafi.Core.Products;
 using Mafi.Core.Prototypes;
 using Mafi.Core.Terrain;
 using Mafi.Core.UiState;
@@ -125,7 +130,56 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
     {
         var statsSummery = _statsSummeryService.GenerateFor(selectedEntities);
 
+
+        var inputDic = new Dict<ProductProto, int>();
+        var outputDic = new Dict<ProductProto, int>();
+
+        foreach (var selectedEntity in selectedEntities)
+        {
+            if (selectedEntity is Machine machine)
+            {
+                foreach (var recipeProto in machine.RecipesAssigned.AsEnumerable())
+                {
+                    foreach (var recipeInput in recipeProto.AllInputs.AsEnumerable())
+                    {
+                        if (inputDic.TryGetValue(recipeInput.Product, out var existing))
+                        {
+                            inputDic[recipeInput.Product] = existing + recipeInput.Quantity.Value;
+                        }
+                        else
+                        {
+                            inputDic.Add(recipeInput.Product, recipeInput.Quantity.Value);
+                        }
+                    }
+
+                    foreach (var recipeOutput in recipeProto.AllOutputs.AsEnumerable())
+                    {
+                        if (inputDic.TryGetValue(recipeOutput.Product, out var existing))
+                        {
+                            outputDic[recipeOutput.Product] = existing + recipeOutput.Quantity.Value;
+                        }
+                        else
+                        {
+                            outputDic.Add(recipeOutput.Product, recipeOutput.Quantity.Value);
+                        }
+                    }
+                }
+            }
+        }
+
+        Log.Info("---- Input Products:");
+        inputDic
+            .Select((id, quant) => $"Product.Id: {id} | Quantity: {quant}")
+            .ToList()
+            .ForEach(Log.Info);
+        Log.Info("---- Output Products:");
+        outputDic
+            .Select((id, quant) => $"Product.Id: {id} | Quantity: {quant}")
+            .ToList()
+            .ForEach(Log.Info);
+
         _rateCalculatorWindowController.SetStats(statsSummery);
+        _rateCalculatorWindowController.SetProducts(inputDic, outputDic);
         _rateCalculatorWindowController.Open();
     }
 }
