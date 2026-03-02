@@ -133,6 +133,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
 
         var inputDic = new Dict<ProductProto, int>();
         var outputDic = new Dict<ProductProto, int>();
+        var intermediatesDic = new Dict<ProductProto, int>();
 
         foreach (var selectedEntity in selectedEntities)
         {
@@ -154,7 +155,7 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
 
                     foreach (var recipeOutput in recipeProto.AllOutputs.AsEnumerable())
                     {
-                        if (inputDic.TryGetValue(recipeOutput.Product, out var existing))
+                        if (outputDic.TryGetValue(recipeOutput.Product, out var existing))
                         {
                             outputDic[recipeOutput.Product] = existing + recipeOutput.Quantity.Value;
                         }

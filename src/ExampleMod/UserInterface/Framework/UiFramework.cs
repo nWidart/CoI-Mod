@@ -40,6 +40,13 @@ public class UiFramework
         };
         return component;
     }
+    
+    public static UiComponent StartNewEmptyRow()
+    {
+        var component = new Row(2.pt());
+        component.Add(c => c.PaddingLeft(4.pt()).AlignItemsStretch());
+        return component;
+    }
 
     public static UiComponent StartNewRow(UiComponent[] children)
     {

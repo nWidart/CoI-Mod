@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using ExampleMod.Extensions;
 using ExampleMod.UserInterface.Framework;
 using Mafi;
 using Mafi.Collections;
+using Mafi.Core;
 using Mafi.Core.Products;
 using Mafi.Core.Syncers;
 using Mafi.Localization;
@@ -47,41 +47,74 @@ public class RateCalculatorWindowUi : Window
         var statsPanel = UiFramework.StartNewPanel(new[] { GetStatsSection() });
         var tablePanel = UiFramework.StartNewPanel(new[] { tableSection });
 
-        var ingredientsPanel = UiFramework.StartNewPanel(new[] { UiFramework.StartNewSection("Ingredients".AsLoc()) });
+        var ingredientsPanel = GetIngredientsPanel();
         var productsPanel = GetProductsPanel();
         var intermediatesPanel = UiFramework.StartNewPanel(new[] { UiFramework.StartNewSection("Intermediates".AsLoc()) });
 
-        Body.Add(statsPanel, tablePanel, ingredientsPanel, productsPanel, intermediatesPanel);
+        Body.Add(statsPanel, ingredientsPanel, productsPanel, intermediatesPanel);
     }
-
-    // privateProperty = a Column
-    // privateProperty.Observe<GameDate>((Func<GameDate>)(() => this.m_calendar.CurrentDate))
-    //     .Do((Action<GameDate>)(date => dateDisplay.Value<Mafi.Unity.Ui.Library.Display>(date.FormatLong()
-    //         .AsLoc())));
+    
     private Panel GetProductsPanel()
     {
+        var host = this;
+        var productWrapperRow = UiFramework.StartNewEmptyRow();
         var productsSection = UiFramework.StartNewSection("Products".AsLoc());
-        var startNewPanel = UiFramework.StartNewPanel(new[] { productsSection });
-
-        if (inputDictionary != null)
-        {
-            var icons = new List<Column>();
-
-            foreach (var product in inputDictionary.Keys)
+        productsSection.Add(productWrapperRow);
+        
+        var productsPanel = UiFramework.StartNewPanel(new[] { productsSection });
+        
+        this
+            .Observe((Func<Dict<ProductProto, int>>)(() => host.outputDictionary))
+            .Do(dict =>
             {
-                var icon = new Icon(product)
-                    .Size(ProductQuantityUi.ICON_HEIGHT)
-                    .MarginRight(10.px());
-                var column = new Column(10.px()) { icon };
-                // .Observe((Func<Column>)(() => new Column(10.px())));
-                //  .Do(col => col.Add(new Icon(product)));
-                icons.Add(column);
-            }
+                productWrapperRow.Clear();
+                var row = new Row();
+                foreach (var (productProto, quantity) in dict)
+                {
+                    //var productQuantityUi = new ProductQuantityUi();
+                    //productQuantityUi.Value(productProto)
+                    //new ProductQuantity(productProto, quantity);
+                    //productQuantityUi.Values("Assets/Unity/UserInterface/General/Fertility.svg", quantity);
+                    
+                    var icon = new Icon(productProto)
+                        .Size(ProductQuantityUi.ICON_HEIGHT)
+                        .MarginRight(10.px());
+                    row.Add(icon);
+                    row.Add(new Label($"{quantity}".ToDoLoc()));
+                }
+                productWrapperRow.Add(row);
+            });
 
-            startNewPanel.Body.Add(new Row(10.px()) { icons.ToArray() });
-        }
+        return productsPanel;
+    }
+    
+    private Panel GetIngredientsPanel()
+    {
+        var host = this;
+        var wrapperRow = UiFramework.StartNewEmptyRow();
+        var productsSection = UiFramework.StartNewSection("Ingredients".AsLoc());
+        productsSection.Add(wrapperRow);
+        var productsPanel = UiFramework.StartNewPanel(new[] { productsSection });
+        
+        this
+            .Observe((Func<Dict<ProductProto, int>>)(() => host.inputDictionary))
+            .Do(dict =>
+            {
+                wrapperRow.Clear();
+                
+                var row = new Row();
+                foreach (var (productProto, quantity) in dict)
+                {
+                    var icon = new Icon(productProto)
+                        .Size(ProductQuantityUi.ICON_HEIGHT)
+                        .MarginRight(10.px());
+                    row.Add(icon);
+                    row.Add(new Label($"{quantity}".ToDoLoc()));
+                }
+                wrapperRow.Add(row);
+            });
 
-        return startNewPanel;
+        return productsPanel;
     }
 
     private Column GetStatsSection()
