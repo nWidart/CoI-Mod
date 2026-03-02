@@ -18,15 +18,15 @@ namespace ExampleMod.UserInterface.RateCalculator;
 public class RateCalculatorWindowUi : Window
 {
     private StatsSummery _statsSummery;
-    private Dict<ProductProto, int> inputDictionary;
-    private Dict<ProductProto, int> outputDictionary;
+    private Dict<ProductProto, Fix32> inputDictionary;
+    private Dict<ProductProto, Fix32> outputDictionary;
 
     private void SetStats(StatsSummery statsSummery)
     {
         _statsSummery = statsSummery;
     }
 
-    private void SetProducts(Dict<ProductProto, int> inputDictionary, Dict<ProductProto, int> outputDictionary)
+    private void SetProducts(Dict<ProductProto, Fix32> inputDictionary, Dict<ProductProto, Fix32> outputDictionary)
     {
         this.inputDictionary = inputDictionary;
         this.outputDictionary = outputDictionary;
@@ -64,7 +64,7 @@ public class RateCalculatorWindowUi : Window
         var productsPanel = UiFramework.StartNewPanel(new[] { productsSection });
         
         this
-            .Observe((Func<Dict<ProductProto, int>>)(() => host.outputDictionary))
+            .Observe((Func<Dict<ProductProto, Fix32>>)(() => host.outputDictionary))
             .Do(dict =>
             {
                 productWrapperRow.Clear();
@@ -97,7 +97,7 @@ public class RateCalculatorWindowUi : Window
         var productsPanel = UiFramework.StartNewPanel(new[] { productsSection });
         
         this
-            .Observe((Func<Dict<ProductProto, int>>)(() => host.inputDictionary))
+            .Observe((Func<Dict<ProductProto, Fix32>>)(() => host.inputDictionary))
             .Do(dict =>
             {
                 wrapperRow.Clear();
@@ -170,7 +170,7 @@ public class RateCalculatorWindowUi : Window
             Window.SetStats(statsSummery);
         }
 
-        public void SetProducts(Dict<ProductProto, int> inputDic, Dict<ProductProto, int> outputDic)
+        public void SetProducts(Dict<ProductProto, Fix32> inputDic, Dict<ProductProto, Fix32> outputDic)
         {
             Window.SetProducts(inputDic, outputDic);
         }

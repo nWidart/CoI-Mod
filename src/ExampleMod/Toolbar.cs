@@ -131,9 +131,9 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
         var statsSummery = _statsSummeryService.GenerateFor(selectedEntities);
 
 
-        var inputDic = new Dict<ProductProto, int>();
-        var outputDic = new Dict<ProductProto, int>();
-        var intermediatesDic = new Dict<ProductProto, int>();
+        var inputDic = new Dict<ProductProto, Fix32>();
+        var outputDic = new Dict<ProductProto, Fix32>();
+        var intermediatesDic = new Dict<ProductProto, Fix32>();
 
         foreach (var selectedEntity in selectedEntities)
         {
@@ -141,15 +141,17 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
             {
                 foreach (var recipeProto in machine.RecipesAssigned.AsEnumerable())
                 {
+                    var multiplier = Duration.OneMonth.Ticks / recipeProto.Duration.Ticks.ToFix32();
+
                     foreach (var recipeInput in recipeProto.AllInputs.AsEnumerable())
                     {
                         if (inputDic.TryGetValue(recipeInput.Product, out var existing))
                         {
-                            inputDic[recipeInput.Product] = existing + recipeInput.Quantity.Value;
+                            inputDic[recipeInput.Product] = existing + recipeInput.Quantity.Value * multiplier;
                         }
                         else
                         {
-                            inputDic.Add(recipeInput.Product, recipeInput.Quantity.Value);
+                            inputDic.Add(recipeInput.Product, recipeInput.Quantity.Value * multiplier);
                         }
                     }
 
@@ -157,11 +159,11 @@ public class Toolbar : BaseEntityCursorInputController<IStaticEntity>
                     {
                         if (outputDic.TryGetValue(recipeOutput.Product, out var existing))
                         {
-                            outputDic[recipeOutput.Product] = existing + recipeOutput.Quantity.Value;
+                            outputDic[recipeOutput.Product] = existing + recipeOutput.Quantity.Value * multiplier;
                         }
                         else
                         {
-                            outputDic.Add(recipeOutput.Product, recipeOutput.Quantity.Value);
+                            outputDic.Add(recipeOutput.Product, recipeOutput.Quantity.Value * multiplier);
                         }
                     }
                 }
